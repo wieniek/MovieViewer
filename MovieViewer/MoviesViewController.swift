@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AFNetworking
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
   
@@ -71,8 +72,20 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // get data and set the labeles
     let title = movie["title"] as! String
     let overview = movie["overview"] as! String
+    let posterPath = movie["poster_path"] as! String
+    
+    // create poster URL and set image view
+    let baseUrl = "https://image.tmdb.org/t/p/w500"
+    if let imageUrl = URL(string: baseUrl + posterPath) {
+      cell.posterView.setImageWith(imageUrl)
+    }
+    
     cell.titleLabel.text = title
     cell.overviewLabel.text = overview
+
+    
+    
+    
     return cell
   }
   
