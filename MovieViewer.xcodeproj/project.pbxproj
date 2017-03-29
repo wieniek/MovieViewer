@@ -8,20 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		F46EA1721E8ABCE600971403 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46EA1711E8ABCE600971403 /* AppDelegate.swift */; };
-		F46EA1741E8ABCE600971403 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46EA1731E8ABCE600971403 /* ViewController.swift */; };
 		F46EA1771E8ABCE600971403 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F46EA1751E8ABCE600971403 /* Main.storyboard */; };
 		F46EA1791E8ABCE600971403 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F46EA1781E8ABCE600971403 /* Assets.xcassets */; };
 		F46EA17C1E8ABCE600971403 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F46EA17A1E8ABCE600971403 /* LaunchScreen.storyboard */; };
+		F46EA1841E8ABDA700971403 /* MoviesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46EA1831E8ABDA700971403 /* MoviesViewController.swift */; };
+		F46EA1871E8BA25B00971403 /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46EA1861E8BA25B00971403 /* MovieCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F46EA16E1E8ABCE600971403 /* MovieViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MovieViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F46EA1711E8ABCE600971403 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F46EA1731E8ABCE600971403 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		F46EA1761E8ABCE600971403 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F46EA1781E8ABCE600971403 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F46EA17B1E8ABCE600971403 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F46EA17D1E8ABCE600971403 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F46EA1831E8ABDA700971403 /* MoviesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoviesViewController.swift; sourceTree = "<group>"; };
+		F46EA1861E8BA25B00971403 /* MovieCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,14 +56,31 @@
 		F46EA1701E8ABCE600971403 /* MovieViewer */ = {
 			isa = PBXGroup;
 			children = (
+				F46EA1881E8BA28400971403 /* View Controllers */,
+				F46EA1851E8BA20A00971403 /* Views */,
 				F46EA1711E8ABCE600971403 /* AppDelegate.swift */,
-				F46EA1731E8ABCE600971403 /* ViewController.swift */,
 				F46EA1751E8ABCE600971403 /* Main.storyboard */,
 				F46EA1781E8ABCE600971403 /* Assets.xcassets */,
 				F46EA17A1E8ABCE600971403 /* LaunchScreen.storyboard */,
 				F46EA17D1E8ABCE600971403 /* Info.plist */,
 			);
 			path = MovieViewer;
+			sourceTree = "<group>";
+		};
+		F46EA1851E8BA20A00971403 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F46EA1861E8BA25B00971403 /* MovieCell.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		F46EA1881E8BA28400971403 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				F46EA1831E8ABDA700971403 /* MoviesViewController.swift */,
+			);
+			name = "View Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -136,8 +155,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F46EA1741E8ABCE600971403 /* ViewController.swift in Sources */,
 				F46EA1721E8ABCE600971403 /* AppDelegate.swift in Sources */,
+				F46EA1841E8ABDA700971403 /* MoviesViewController.swift in Sources */,
+				F46EA1871E8BA25B00971403 /* MovieCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
