@@ -14,7 +14,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   
   
   @IBOutlet weak var tableView: UITableView!
-  
+  @IBOutlet weak var errorView: UIView!
+  @IBOutlet weak var errorImage: UIImageView!
   // array of dictionaries which represents each movie
   // retrieved with URLSession network request
   var movies: [NSDictionary]?
@@ -30,20 +31,22 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     MBProgressHUD.showAdded(to: self.view, animated: true)
     
     let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
-      
       // Hide HUD once the network request comes back
       MBProgressHUD.hide(for: self.view, animated: true)
-      
       // Check for error
       if let error = error {
-        //errorCallBack?(error)
+        // show error view
+        self.errorView.alpha = 1.0
+        self.tableView.reloadData()
         print("ERROR = \(error)")
       } else if let data = data,
         let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
         // load results to movies variable
         self.movies = dataDictionary["results"] as? [NSDictionary]
+        // hide error view, just in case it was visible
+        // and reload table view
+        self.errorView.alpha = 0.0
         self.tableView.reloadData()
-        //successCallBack(dataDictionary)
       }
     }
     task.resume()
@@ -57,18 +60,29 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
     let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
       if let error = error {
-        //errorCallBack?(error)
-        print("ERROR = \(error)")
+        // show error view
+        self.errorView.alpha = 1.0
+        refreshControl.endRefreshing()
+        self.tableView.reloadData()
+        NSLog("ERROR = \(error)")
       } else if let data = data,
         let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
         // load results to movies variable
         self.movies = dataDictionary["results"] as? [NSDictionary]
-        self.tableView.reloadData()
+        // hide error view, just in case it was visible
+        // and reload table view
+        self.errorView.alpha = 0.0
         refreshControl.endRefreshing()
-        //successCallBack(dataDictionary)
+        self.tableView.reloadData()
       }
     }
     task.resume()
+  }
+  
+  // Setup error view and hide it before loading the table view
+  override func viewWillAppear(_ animated: Bool) {
+    errorImage.image = UIImage(named: "error")
+    errorView.alpha = 0.0
   }
   
   override func viewDidLoad() {
@@ -76,6 +90,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // set MoviesViewController as TableView DataSource and Delegate
     tableView.dataSource = self
     tableView.delegate = self
+    
+    
     
     // Add refresh control to table view
     let refreshControl = UIRefreshControl()
