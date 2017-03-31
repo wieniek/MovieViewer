@@ -72,31 +72,35 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     // get data and set the labeles
     let title = movie["title"] as! String
     let overview = movie["overview"] as! String
-    let posterPath = movie["poster_path"] as! String
     
     // create poster URL and set image view
-    let baseUrl = "https://image.tmdb.org/t/p/w500"
-    if let imageUrl = URL(string: baseUrl + posterPath) {
-      cell.posterView.setImageWith(imageUrl)
+    if let posterPath = movie["poster_path"] as? String {
+      let baseUrl = "https://image.tmdb.org/t/p/w500"
+      let imageUrl = URL(string: baseUrl + posterPath)
+      cell.posterView.setImageWith(imageUrl!)
     }
     
     cell.titleLabel.text = title
     cell.overviewLabel.text = overview
 
     
-    
-    
     return cell
   }
   
-  /*
-   // MARK: - Navigation
-   
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
+  // Navigation seque transition to DetailViewController
+  // sender is MovieCell clicked by user
    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-   // Get the new view controller using segue.destinationViewController.
-   // Pass the selected object to the new view controller.
+    
+      // get selected cell index
+      let cell = sender as! UITableViewCell
+      let indexPath = tableView.indexPath(for: cell)
+    
+      // get movie details for selected cell
+      let movie = movies?[(indexPath?.row)!]
+    
+      // cast destination view controller to set movie property
+      let detailViewController = segue.destination as! DetailViewController
+      detailViewController.movie = movie
+    
    }
-   */
-  
 }
