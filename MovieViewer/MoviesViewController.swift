@@ -10,15 +10,17 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-  
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
   
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var errorView: UIView!
   @IBOutlet weak var errorImage: UIImageView!
+  @IBOutlet weak var searchBar: UISearchBar!
+  
   // array of dictionaries which represents each movie
   // retrieved with URLSession network request
   var movies: [NSDictionary]?
+  var moviesFiltered: [NSDictionary]?
   
   // network request using URLSession
   func loadFromUrl() {
@@ -43,6 +45,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
         // load results to movies variable
         self.movies = dataDictionary["results"] as? [NSDictionary]
+        self.moviesFiltered = self.movies
         // hide error view, just in case it was visible
         // and reload table view
         self.errorView.alpha = 0.0
@@ -69,6 +72,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
         // load results to movies variable
         self.movies = dataDictionary["results"] as? [NSDictionary]
+        self.moviesFiltered = self.movies
         // hide error view, just in case it was visible
         // and reload table view
         self.errorView.alpha = 0.0
@@ -87,11 +91,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    // set MoviesViewController as TableView DataSource and Delegate
+    // set MoviesViewController as delegate and data source
     tableView.dataSource = self
     tableView.delegate = self
-    
-    
+    searchBar.delegate = self
     
     // Add refresh control to table view
     let refreshControl = UIRefreshControl()
@@ -111,7 +114,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   // implement UITableViewDataSource required methods
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     // set number of rows in table view
-    if let movies = movies {
+    if let movies = moviesFiltered {
       return movies.count
     } else {
       return 0
@@ -123,7 +126,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
     
     // get movie corresponding to indexPath from the movies array
-    let movie = movies![indexPath.row]
+    let movie = moviesFiltered![indexPath.row]
     // get data and set the labeles
     let title = movie["title"] as! String
     let overview = movie["overview"] as! String
@@ -144,6 +147,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     tableView.deselectRow(at: indexPath, animated: true)
   }
   
+  // Populate moviesFiltered dictionary based on searched text
+  func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    print(" text did change = \(searchText)")
+    if searchText != "" {
+      moviesFiltered = movies?.filter { String(describing: $0["title"]).range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil}
+    } else {
+      moviesFiltered = movies
+    }
+    tableView.reloadData()
+  }
+  
   // Navigation seque transition to DetailViewController
   // sender is MovieCell clicked by user
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -153,7 +167,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let indexPath = tableView.indexPath(for: cell)
     
     // get movie details for selected cell
-    let movie = movies?[(indexPath?.row)!]
+    let movie = moviesFiltered?[(indexPath?.row)!]
     
     // cast destination view controller to set movie property
     let detailViewController = segue.destination as! DetailViewController
