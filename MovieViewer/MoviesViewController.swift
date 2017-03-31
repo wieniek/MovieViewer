@@ -134,12 +134,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
       let imageUrl = URL(string: baseUrl + posterPath)
       cell.posterView.setImageWith(imageUrl!)
     }
-    
     cell.titleLabel.text = title
     cell.overviewLabel.text = overview
-    
-    
     return cell
+  }
+  
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    // Get rid of the gray selection effect by deselecting the cell
+    tableView.deselectRow(at: indexPath, animated: true)
   }
   
   // Navigation seque transition to DetailViewController

@@ -26,6 +26,9 @@ class DetailViewController: UIViewController {
     // set scroll view content size
     scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: infoView.frame.origin.y + infoView.frame.size.height)
     
+    // since global scroll view color was set to skyBlue in AppDelegate
+    // must undo this change here for detail scroll view
+    scrollView.backgroundColor = UIColor.clear
     
     // after view is loaded, get movie details and set labels
     let title = movie?["title"] as? String
