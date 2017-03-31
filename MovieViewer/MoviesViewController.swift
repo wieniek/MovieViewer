@@ -18,14 +18,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   // retrieved with URLSession network request
   var movies: [NSDictionary]?
   
-  
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    // set MoviesViewController as TableView DataSource and Delegate
-    tableView.dataSource = self
-    tableView.delegate = self
-    
-    // network request using URLSession
+  // network request using URLSession
+  func loadFromUrl(_ refreshControl: UIRefreshControl) {
     let apiKey = "f369874e61746bfeb1fce02b24b3a5cb"
     let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
     let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
@@ -36,15 +30,29 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         print("ERROR = \(error)")
       } else if let data = data,
         let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
-        print("JSON OKAY")
-        //print(dataDictionary)
         // load results to movies variable
         self.movies = dataDictionary["results"] as? [NSDictionary]
         self.tableView.reloadData()
+        refreshControl.endRefreshing()
         //successCallBack(dataDictionary)
       }
     }
     task.resume()
+  }
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    // set MoviesViewController as TableView DataSource and Delegate
+    tableView.dataSource = self
+    tableView.delegate = self
+    
+    // Add refresh control to table view
+    let refreshControl = UIRefreshControl()
+    refreshControl.addTarget(self, action: #selector(loadFromUrl(_:)), for: UIControlEvents.valueChanged)
+    tableView.insertSubview(refreshControl, at: 0)
+    
+    // Load data using network request
+    loadFromUrl(refreshControl)
     
   }
   
@@ -82,25 +90,25 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     cell.titleLabel.text = title
     cell.overviewLabel.text = overview
-
+    
     
     return cell
   }
   
   // Navigation seque transition to DetailViewController
   // sender is MovieCell clicked by user
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     
-      // get selected cell index
-      let cell = sender as! UITableViewCell
-      let indexPath = tableView.indexPath(for: cell)
+    // get selected cell index
+    let cell = sender as! UITableViewCell
+    let indexPath = tableView.indexPath(for: cell)
     
-      // get movie details for selected cell
-      let movie = movies?[(indexPath?.row)!]
+    // get movie details for selected cell
+    let movie = movies?[(indexPath?.row)!]
     
-      // cast destination view controller to set movie property
-      let detailViewController = segue.destination as! DetailViewController
-      detailViewController.movie = movie
+    // cast destination view controller to set movie property
+    let detailViewController = segue.destination as! DetailViewController
+    detailViewController.movie = movie
     
-   }
+  }
 }

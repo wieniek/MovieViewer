@@ -14,6 +14,8 @@ class DetailViewController: UIViewController {
   @IBOutlet weak var posterImageView: UIImageView!
   @IBOutlet weak var titleLabel: UILabel!
   @IBOutlet weak var overviewLabel: UILabel!
+  @IBOutlet weak var scrollView: UIScrollView!
+  @IBOutlet weak var infoView: UIView!
   
   // Dictionary to store movie details populated by seque
   var movie: NSDictionary?
@@ -21,11 +23,17 @@ class DetailViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    // set scroll view content size
+    scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: infoView.frame.origin.y + infoView.frame.size.height)
+    
+    
     // after view is loaded, get movie details and set labels
     let title = movie?["title"] as? String
     titleLabel.text = title
     let overview = movie?["overview"] as? String
     overviewLabel.text = overview
+    // sizeToFit sets label text top vertical aligment
+    overviewLabel.sizeToFit()
     
     // create poster URL and set image view
     if let posterPath = movie?["poster_path"] as? String {
