@@ -14,5 +14,10 @@ class MovieCell: UITableViewCell {
   @IBOutlet weak var overviewLabel: UILabel!
   @IBOutlet weak var posterView: UIImageView!
   
+  override func awakeFromNib() {
+    super.awakeFromNib()
+    // No color when user selects cell
+    selectionStyle = .none
+  }
 }
 
