@@ -21,11 +21,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   // retrieved with URLSession network request
   var movies: [NSDictionary]?
   var moviesFiltered: [NSDictionary]?
+  var endPoint: String = "now_playing"
   
   // network request using URLSession
   func loadFromUrl() {
     let apiKey = "f369874e61746bfeb1fce02b24b3a5cb"
-    let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
+    let url = URL(string: "https://api.themoviedb.org/3/movie/\(endPoint)?api_key=\(apiKey)")!
     let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
     let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
     
