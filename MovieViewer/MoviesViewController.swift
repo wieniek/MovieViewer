@@ -10,12 +10,13 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
   
   @IBOutlet weak var tableView: UITableView!
   @IBOutlet weak var errorView: UIView!
   @IBOutlet weak var errorImage: UIImageView!
   @IBOutlet weak var searchBar: UISearchBar!
+  @IBOutlet weak var collectionView: UICollectionView!
   
   // array of dictionaries which represents each movie
   // retrieved with URLSession network request
@@ -51,6 +52,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // and reload table view
         self.errorView.alpha = 0.0
         self.tableView.reloadData()
+        self.collectionView.reloadData()
       }
     }
     task.resume()
@@ -79,6 +81,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         self.errorView.alpha = 0.0
         refreshControl.endRefreshing()
         self.tableView.reloadData()
+        self.collectionView.reloadData()
       }
     }
     task.resume()
@@ -96,6 +99,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     tableView.dataSource = self
     tableView.delegate = self
     searchBar.delegate = self
+    collectionView.dataSource = self
+    collectionView.delegate = self
     
     // Add refresh control to table view
     let refreshControl = UIRefreshControl()
@@ -114,12 +119,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   
   // implement UITableViewDataSource required methods
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    // set number of rows in table view
-    if let movies = moviesFiltered {
-      return movies.count
-    } else {
-      return 0
-    }
+    // return number of rows in table view
+    return moviesFiltered?.count ?? 0
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -146,6 +147,31 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     // Get rid of the gray selection effect by deselecting the cell
     tableView.deselectRow(at: indexPath, animated: true)
+  }
+  
+  // implement UICollectionViewDataSource required methods
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    // return number of items in collection view
+    return moviesFiltered?.count ?? 0
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    // add movie poster to cell
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MovieCollectionCell", for: indexPath) as! MovieCollectionCell
+    
+    // get movie corresponding to indexPath from the movies array
+    let movie = moviesFiltered![indexPath.row]
+    // get data and set the label
+    // let title = movie["title"] as! String
+    // cell.movieTitle.text = title
+    // cell.movieTitle.sizeToFit()
+    // get data and set the image
+    if let posterPath = movie["poster_path"] as? String {
+      let baseUrl = "https://image.tmdb.org/t/p/w500"
+      let imageUrl = URL(string: baseUrl + posterPath)
+      cell.moviePoster.setImageWith(imageUrl!)
+    }
+    return cell
   }
   
   // Populate moviesFiltered dictionary based on searched text
