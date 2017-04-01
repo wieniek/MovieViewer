@@ -20,10 +20,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let darkerSkyBlue = darkerColorFor(uicolor: skyBlue)
     UINavigationBar.appearance().tintColor = UIColor.black
     UINavigationBar.appearance().barTintColor = darkerSkyBlue
-    UIScrollView.appearance().backgroundColor = skyBlue
+    UIScrollView.appearance().backgroundColor = darkerSkyBlue
     UITabBar.appearance().tintColor = UIColor.black
     UITabBar.appearance().unselectedItemTintColor = UIColor.darkGray
     UITabBar.appearance().barTintColor = darkerSkyBlue
+    UISearchBar.appearance().tintColor = darkerSkyBlue
     
     // Get handle to the storyboard
     window = UIWindow(frame: UIScreen.main.bounds)

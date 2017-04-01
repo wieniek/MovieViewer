@@ -42,6 +42,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // show error view
         self.errorView.alpha = 1.0
         self.tableView.reloadData()
+        self.collectionView.reloadData()
         print("ERROR = \(error)")
       } else if let data = data,
         let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
@@ -70,6 +71,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         self.errorView.alpha = 1.0
         refreshControl.endRefreshing()
         self.tableView.reloadData()
+        self.collectionView.reloadData()
         NSLog("ERROR = \(error)")
       } else if let data = data,
         let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
@@ -106,6 +108,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let refreshControl = UIRefreshControl()
     refreshControl.addTarget(self, action: #selector(loadFromUrl(_:)), for: UIControlEvents.valueChanged)
     tableView.insertSubview(refreshControl, at: 0)
+    
+    // Position search bar on top of the navigation bar
+    // navigationItem.titleView = searchBar
     
     // Load data using network request
     loadFromUrl()
@@ -176,29 +181,36 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   
   // Populate moviesFiltered dictionary based on searched text
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-    print(" text did change = \(searchText)")
     if searchText != "" {
       moviesFiltered = movies?.filter { String(describing: $0["title"]).range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil}
     } else {
       moviesFiltered = movies
     }
     tableView.reloadData()
+    collectionView.reloadData()
   }
   
   // Navigation seque transition to DetailViewController
-  // sender is MovieCell clicked by user
+  // sender is cell clicked by user
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     
-    // get selected cell index
-    let cell = sender as! UITableViewCell
-    let indexPath = tableView.indexPath(for: cell)
+    var indexPath: IndexPath?
+    
+    // Check which view controller initiated the seque
+    if segue.identifier == "CollectionViewSegue" {
+      // get selected cell index
+      let cell = sender as! UICollectionViewCell
+      indexPath = collectionView.indexPath(for: cell)
+    } else {
+      // get selected cell index
+      let cell = sender as! UITableViewCell
+      indexPath = tableView.indexPath(for: cell)
+    }
     
     // get movie details for selected cell
     let movie = moviesFiltered?[(indexPath?.row)!]
-    
     // cast destination view controller to set movie property
     let detailViewController = segue.destination as! DetailViewController
     detailViewController.movie = movie
-    
   }
 }

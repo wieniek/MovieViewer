@@ -24,7 +24,6 @@
                                 <searchBar key="tableHeaderView" contentMode="redraw" searchBarStyle="minimal" translucent="NO" id="YjN-8a-Xep">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                    <color key="backgroundColor" red="0.40000000600000002" green="0.80000001190000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     <textInputTraits key="textInputTraits"/>
                                 </searchBar>
                                 <prototypes>
@@ -60,7 +59,7 @@
                                             <outlet property="overviewLabel" destination="99d-eW-y9i" id="DuV-hw-QFa"/>
                                             <outlet property="posterView" destination="vFf-9d-1Nl" id="J7w-6C-xBi"/>
                                             <outlet property="titleLabel" destination="zIR-Kj-bQo" id="pyp-w6-bD1"/>
-                                            <segue destination="WuF-SZ-UN8" kind="push" id="Udl-p1-Hn3"/>
+                                            <segue destination="WuF-SZ-UN8" kind="push" identifier="TableViewSegue" id="Udl-p1-Hn3"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -92,6 +91,7 @@
                                         <size key="customSize" width="115" height="150"/>
                                         <connections>
                                             <outlet property="moviePoster" destination="uFD-gP-psY" id="W9K-H7-mNG"/>
+                                            <segue destination="WuF-SZ-UN8" kind="push" identifier="CollectionViewSegue" id="LE3-Y6-aOd"/>
                                         </connections>
                                     </collectionViewCell>
                                 </cells>
@@ -209,4 +209,7 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination" type="retina4_7.fullscreen"/>
     </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="LE3-Y6-aOd"/>
+    </inferredMetricsTieBreakers>
 </document>
