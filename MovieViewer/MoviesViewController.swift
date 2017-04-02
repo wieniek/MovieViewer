@@ -32,14 +32,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   // Action triggered by user clicking segmented control
   @IBAction func changeViewType(_ sender: UISegmentedControl) {
     
-    // switch on segment selected
+    // switch on selected segment of UISegmentedControl
     switch sender.selectedSegmentIndex {
     case 0:
       // collection view selected
       collectionView.isHidden = false
+      collectionView.insertSubview(refreshControl, at: 0)
     case 1:
       // table view selected
       collectionView.isHidden = true
+      tableView.insertSubview(refreshControl, at: 0)
     default: break
     }
   }
@@ -61,7 +63,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     // Add refresh control to table view
     refreshControl.addTarget(self, action: #selector(loadDataFromNetwork), for: UIControlEvents.valueChanged)
-    tableView.insertSubview(refreshControl, at: 0)
     
     // Position segmented control on top of the navigation bar
     navigationItem.titleView = segmentedControl
