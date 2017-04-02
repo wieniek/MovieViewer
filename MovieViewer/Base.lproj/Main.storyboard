@@ -114,6 +114,17 @@
                                 </subviews>
                                 <color key="backgroundColor" red="1" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" id="fWf-r1-hRf">
+                                <rect key="frame" x="0.0" y="639" width="375" height="29"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Posters"/>
+                                    <segment title="Details"/>
+                                </segments>
+                                <connections>
+                                    <action selector="changeViewType:" destination="BYZ-38-t0r" eventType="valueChanged" id="vIa-Ds-9WY"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" red="0.40000000600000002" green="0.80000001190000003" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     </view>
@@ -123,6 +134,7 @@
                         <outlet property="errorImage" destination="pT0-70-DTX" id="930-It-W0L"/>
                         <outlet property="errorView" destination="0w2-UH-xBn" id="5sT-a5-V9P"/>
                         <outlet property="searchBar" destination="YjN-8a-Xep" id="ah2-vb-gaR"/>
+                        <outlet property="segmentedControl" destination="fWf-r1-hRf" id="x0a-Xt-Yjp"/>
                         <outlet property="tableView" destination="aNl-Eq-ZTP" id="QbF-Zt-xYu"/>
                     </connections>
                 </viewController>

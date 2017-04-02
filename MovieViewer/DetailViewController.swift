@@ -18,7 +18,7 @@ class DetailViewController: UIViewController {
   @IBOutlet weak var infoView: UIView!
   
   // Dictionary to store movie details populated by seque
-  var movie: NSDictionary?
+  var movie: Movie?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -31,38 +31,16 @@ class DetailViewController: UIViewController {
     scrollView.backgroundColor = UIColor.clear
     
     // after view is loaded, get movie details and set labels
-    let title = movie?["title"] as? String
-    titleLabel.text = title
-    let overview = movie?["overview"] as? String
-    overviewLabel.text = overview
+    titleLabel.text = movie?.title ?? ""
+    overviewLabel.text = movie?.overview ?? ""
     // sizeToFit sets label text top vertical aligment
     overviewLabel.sizeToFit()
     
     // create poster URL and set image view
-    if let posterPath = movie?["poster_path"] as? String {
+    if let posterPath = movie?.posterPath {
       let baseUrl = "https://image.tmdb.org/t/p/w500"
       let imageUrl = URL(string: baseUrl + posterPath)
       posterImageView.setImageWith(imageUrl!)
     }
-    
-    
-    
   }
-  
-  override func didReceiveMemoryWarning() {
-    super.didReceiveMemoryWarning()
-    // Dispose of any resources that can be recreated.
-  }
-  
-  
-  /*
-   // MARK: - Navigation
-   
-   // In a storyboard-based application, you will often want to do a little preparation before navigation
-   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-   // Get the new view controller using segue.destinationViewController.
-   // Pass the selected object to the new view controller.
-   }
-   */
-  
 }

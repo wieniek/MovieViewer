@@ -17,78 +17,33 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   @IBOutlet weak var errorImage: UIImageView!
   @IBOutlet weak var searchBar: UISearchBar!
   @IBOutlet weak var collectionView: UICollectionView!
+  @IBOutlet weak var segmentedControl: UISegmentedControl!
   
-  // array of dictionaries which represents each movie
-  // retrieved with URLSession network request
-  var movies: [NSDictionary]?
-  var moviesFiltered: [NSDictionary]?
-  var endPoint: String = "now_playing"
+  // arrays to store movie info
+  var movies = [Movie]()
+  var moviesFiltered = [Movie]()
   
-  // network request using URLSession
-  func loadFromUrl() {
-    let apiKey = "f369874e61746bfeb1fce02b24b3a5cb"
-    let url = URL(string: "https://api.themoviedb.org/3/movie/\(endPoint)?api_key=\(apiKey)")!
-    let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-    let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+  // Refresh control for table view
+  let refreshControl = UIRefreshControl()
+  
+  // Part of url which varies depending on required source
+  var endPoint = ""
+  
+  // Action triggered by user clicking segmented control
+  @IBAction func changeViewType(_ sender: UISegmentedControl) {
     
-    // Display HUD right before network request is made
-    MBProgressHUD.showAdded(to: self.view, animated: true)
+    // switch on segment selected
+    switch sender.selectedSegmentIndex {
+    case 0:
+      // collection view selected
+      collectionView.isHidden = false
+    case 1:
+      // table view selected
+      collectionView.isHidden = true
+    default: break
+    }
+  }
     
-    let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
-      // Hide HUD once the network request comes back
-      MBProgressHUD.hide(for: self.view, animated: true)
-      // Check for error
-      if let error = error {
-        // show error view
-        self.errorView.alpha = 1.0
-        self.tableView.reloadData()
-        self.collectionView.reloadData()
-        print("ERROR = \(error)")
-      } else if let data = data,
-        let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
-        // load results to movies variable
-        self.movies = dataDictionary["results"] as? [NSDictionary]
-        self.moviesFiltered = self.movies
-        // hide error view, just in case it was visible
-        // and reload table view
-        self.errorView.alpha = 0.0
-        self.tableView.reloadData()
-        self.collectionView.reloadData()
-      }
-    }
-    task.resume()
-  }
-  
-  // network request using URLSession
-  func loadFromUrl(_ refreshControl: UIRefreshControl) {
-    let apiKey = "f369874e61746bfeb1fce02b24b3a5cb"
-    let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")!
-    let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-    let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-    let task: URLSessionDataTask = session.dataTask(with: request) { (data: Data?, response: URLResponse?, error: Error?) in
-      if let error = error {
-        // show error view
-        self.errorView.alpha = 1.0
-        refreshControl.endRefreshing()
-        self.tableView.reloadData()
-        self.collectionView.reloadData()
-        NSLog("ERROR = \(error)")
-      } else if let data = data,
-        let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
-        // load results to movies variable
-        self.movies = dataDictionary["results"] as? [NSDictionary]
-        self.moviesFiltered = self.movies
-        // hide error view, just in case it was visible
-        // and reload table view
-        self.errorView.alpha = 0.0
-        refreshControl.endRefreshing()
-        self.tableView.reloadData()
-        self.collectionView.reloadData()
-      }
-    }
-    task.resume()
-  }
-  
   // Setup error view and hide it before loading the table view
   override func viewWillAppear(_ animated: Bool) {
     errorImage.image = UIImage(named: "error")
@@ -105,27 +60,63 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     collectionView.delegate = self
     
     // Add refresh control to table view
-    let refreshControl = UIRefreshControl()
-    refreshControl.addTarget(self, action: #selector(loadFromUrl(_:)), for: UIControlEvents.valueChanged)
+    refreshControl.addTarget(self, action: #selector(loadDataFromNetwork), for: UIControlEvents.valueChanged)
     tableView.insertSubview(refreshControl, at: 0)
     
-    // Position search bar on top of the navigation bar
-    // navigationItem.titleView = searchBar
+    // Position segmented control on top of the navigation bar
+    navigationItem.titleView = segmentedControl
     
-    // Load data using network request
-    loadFromUrl()
+    // Could not find strightforward way to chage search bar icon color
+    // This is a bit convoluted solution found on stackoverflow.com
+    // http://stackoverflow.com/questions/35699859
+    let textField = searchBar.value(forKey: "searchField") as! UITextField
+    let glassIconView = textField.leftView as! UIImageView
+    glassIconView.image = glassIconView.image?.withRenderingMode(UIImageRenderingMode.alwaysTemplate)
+    glassIconView.tintColor = UIColor.black
+    let clearButton = textField.value(forKey: "clearButton") as! UIButton
+    clearButton.setImage(clearButton.imageView?.image?.withRenderingMode(UIImageRenderingMode.alwaysTemplate), for: .normal)
+    clearButton.tintColor = UIColor.black
     
+    // Load data to movie arrays
+    loadDataFromNetwork()
   }
   
-  override func didReceiveMemoryWarning() {
-    super.didReceiveMemoryWarning()
-    // Dispose of any resources that can be recreated.
+  // Display HUD and then asynch data load with callbacks
+  func loadDataFromNetwork() {
+    // Display HUD right before network request is made
+    MBProgressHUD.showAdded(to: self.view, animated: true)
+    // Fetch data from network url
+    Movie.fetch(fromEndPoint: endPoint, successCallback: loadFetch, errorCallback: showErrorView)
+  }
+  
+  // Sucessful callback, load results to movie arrays
+  func loadFetch(results: [Movie]){
+    movies = results
+    moviesFiltered = results
+    // hide error view, just in case it was visible
+    errorView.alpha = 0.0
+    tableView.reloadData()
+    collectionView.reloadData()
+    // Hide HUD and refresh control
+    MBProgressHUD.hide(for: self.view, animated: true)
+    refreshControl.endRefreshing()
+  }
+  
+  // Network error, show hidden error view
+  func showErrorView(error: NSError?){
+    // show error view
+    errorView.alpha = 1.0
+    tableView.reloadData()
+    collectionView.reloadData()
+    // Hide HUD and refresh control
+    MBProgressHUD.hide(for: self.view, animated: true)
+    refreshControl.endRefreshing()
   }
   
   // implement UITableViewDataSource required methods
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     // return number of rows in table view
-    return moviesFiltered?.count ?? 0
+    return moviesFiltered.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -133,19 +124,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
     
     // get movie corresponding to indexPath from the movies array
-    let movie = moviesFiltered![indexPath.row]
-    // get data and set the labeles
-    let title = movie["title"] as! String
-    let overview = movie["overview"] as! String
+    let movie = moviesFiltered[indexPath.row]
     
     // create poster URL and set image view
-    if let posterPath = movie["poster_path"] as? String {
+    if let posterPath = movie.posterPath {
       let baseUrl = "https://image.tmdb.org/t/p/w500"
       let imageUrl = URL(string: baseUrl + posterPath)
       cell.posterView.setImageWith(imageUrl!)
     }
-    cell.titleLabel.text = title
-    cell.overviewLabel.text = overview
+    cell.titleLabel.text = movie.title
+    cell.overviewLabel.text = movie.overview
     return cell
   }
   
@@ -157,7 +145,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   // implement UICollectionViewDataSource required methods
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     // return number of items in collection view
-    return moviesFiltered?.count ?? 0
+    return moviesFiltered.count
   }
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -165,13 +153,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MovieCollectionCell", for: indexPath) as! MovieCollectionCell
     
     // get movie corresponding to indexPath from the movies array
-    let movie = moviesFiltered![indexPath.row]
-    // get data and set the label
-    // let title = movie["title"] as! String
-    // cell.movieTitle.text = title
-    // cell.movieTitle.sizeToFit()
+    let movie = moviesFiltered[indexPath.row]
     // get data and set the image
-    if let posterPath = movie["poster_path"] as? String {
+    if let posterPath = movie.posterPath {
       let baseUrl = "https://image.tmdb.org/t/p/w500"
       let imageUrl = URL(string: baseUrl + posterPath)
       cell.moviePoster.setImageWith(imageUrl!)
@@ -182,7 +166,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
   // Populate moviesFiltered dictionary based on searched text
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
     if searchText != "" {
-      moviesFiltered = movies?.filter { String(describing: $0["title"]).range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil}
+      moviesFiltered = movies.filter { String(describing: $0.title).range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil}
     } else {
       moviesFiltered = movies
     }
@@ -208,7 +192,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     // get movie details for selected cell
-    let movie = moviesFiltered?[(indexPath?.row)!]
+    let movie = moviesFiltered[(indexPath?.row)!]
     // cast destination view controller to set movie property
     let detailViewController = segue.destination as! DetailViewController
     detailViewController.movie = movie
